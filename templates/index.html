@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Flask Advanced CRUD App</h2>
+
+<!-- Add Todo -->
+<form action="/todo" method="POST" class="d-flex mb-3">
+    <input type="text" name="task" class="form-control me-2"
+           placeholder="Enter todo..." required>
+    <button class="btn btn-primary">Add</button>
+</form>
+
+<!-- Filters -->
+<div class="mb-3">
+    <a href="/?filter=all" class="btn btn-outline-dark {% if filter=='all' %}active{% endif %}">All</a>
+    <a href="/?filter=completed" class="btn btn-outline-success {% if filter=='completed' %}active{% endif %}">Completed</a>
+    <a href="/?filter=pending" class="btn btn-outline-warning {% if filter=='pending' %}active{% endif %}">Pending</a>
+</div>
+
+<!-- Todo List -->
+<ul class="list-group">
+    {% if todos %}
+        {% for todo in todos %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                <span class="{% if todo.completed %}text-decoration-line-through{% endif %}">
+                    {{ todo.task }}
+                </span>
+
+                <div>
+                    <!-- Toggle Complete -->
+                    <a href="/todo/toggle/{{ loop.index0 }}" class="btn btn-sm btn-info">
+                        ✓
+                    </a>
+
+                    <!-- Edit -->
+                    <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
+                            data-bs-target="#editModal{{ loop.index0 }}">✏️</button>
+
+                    <!-- Delete -->
+                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal{{ loop.index0 }}">🗑️</button>
+                </div>
+            </li>
+
+            <!-- Edit Modal -->
+            <div class="modal fade" id="editModal{{ loop.index0 }}">
+              <div class="modal-dialog">
+                <form method="POST" action="/todo/edit/{{ loop.index0 }}" class="modal-content">
+                  <div class="modal-header">
+                    <h5>Edit Todo</h5>
+                  </div>
+                  <div class="modal-body">
+                    <input type="text" name="task" class="form-control"
+                           value="{{ todo.task }}" required>
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn btn-primary">Save</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Delete Modal -->
+            <div class="modal fade" id="deleteModal{{ loop.index0 }}">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5>Confirm Delete</h5>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure you want to delete "{{ todo.task }}"?
+                  </div>
+                  <div class="modal-footer">
+                    <a href="/todo/delete/{{ loop.index0 }}" class="btn btn-danger">Delete</a>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">No todos yet.</p>
+    {% endif %}
+</ul>
+
+{% endblock %}
